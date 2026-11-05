@@ -215,8 +215,11 @@ function applyGMResult(result, advanceTurn=false){
   }
   if(result.check&&typeof result.check==="object")state.lastCheck=result.check;
   else state.lastCheck=null;
-  if(PLAYER_KEYS.slice(0,state.characters.length).includes(result.turn))state.turn=result.turn;
-  else if(advanceTurn){const idx=state.characters.findIndex(c=>c.player.toLowerCase()===state.turn);state.turn=state.characters[(idx+1)%state.characters.length].player.toLowerCase();}
+  if(advanceTurn){
+  const idx=state.characters.findIndex(c=>c.player.toLowerCase()===state.turn);
+  state.turn=state.characters[(idx+1)%state.characters.length].player.toLowerCase();
+}else if(PLAYER_KEYS.slice(0,state.characters.length).includes(result.turn)){
+  state.turn=result.turn;
 }
 async function submitAction(actionText){
   if(busy||!state)return;

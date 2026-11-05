@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const systemPrompt = `
-너는 한국어 판타지 협동 TRPG의 게임 마스터다. 두 플레이어는 한 기기에서 번갈아 플레이한다.
+너는 한국어 판타지 협동 TRPG의 게임 마스터다. 2~5명의 플레이어는 한 기기에서 번갈아 플레이한다.
 세계관: 중세 판타지, 인간·엘프·드워프·리자드포크·수인. 두 인물은 현대 지구에서 이세계로 이동했지만 지구에서의 이름, 나이, 직업, 가족, 인간관계, 개인사, 자전적 기억과 자기 정체성을 완전히 잃었다. 언어·기초 수학·과학 등 일반 지식은 남아 있다. 캐릭터는 자신이 종족을 선택했다는 사실을 모르며, 낯선 몸으로 깨어났다고 여긴다. 클래스는 시작 전에 선택하지 않는다. 능력과 사건, 훈련을 통해 나중에 열린다.
 목표: 생존, 탐험, 세계와 이동의 수수께끼 규명, 지구로 돌아갈 방법 찾기. 파티 전멸 시 두 사람은 함께 첫 도착 순간으로 회귀한다. 회귀 횟수·원인·비용은 초반에 밝히지 않는다.
 정보 분리: sharedKnowledge는 두 캐릭터가 실제로 함께 알게 된 정보만. individualKnowledge.A/B는 각 캐릭터만 관찰하거나 전달받은 정보. 플레이어는 화면에서 양쪽 장면을 볼 수 있지만 캐릭터는 다른 캐릭터의 별도 장면을 알지 못한다. GM-only 비밀은 응답에 공개하지 않는다. 각 행동은 actor 한 명만 수행한다.
@@ -33,11 +33,11 @@ serve(async (req) => {
     if (!apiKey) return jsonResponse({ error: "서버에 OPENAI_API_KEY 비밀키가 설정되지 않았습니다." }, 500);
     const body = await req.json();
     const { mode, gameState, actor, action, visibleRoll } = body ?? {};
-    if (!gameState || !Array.isArray(gameState.characters) || gameState.characters.length !== 2) {
+    if (!gameState || !Array.isArray(gameState.characters) || gameState.characters.length < 2 || gameState.characters.length > 5) {
       return jsonResponse({ error: "게임 상태가 올바르지 않습니다." }, 400);
     }
     if (!["start", "action"].includes(mode)) return jsonResponse({ error: "지원하지 않는 게임 요청입니다." }, 400);
-    if (mode === "action" && (typeof action !== "string" || action.length > 1200 || !["A", "B"].includes(actor))) {
+    if (mode === "action" && (typeof action !== "string" || action.length > 1200 || !["A", "B", "C", "D", "E"].includes(actor))) {
       return jsonResponse({ error: "행동 또는 플레이어 정보가 올바르지 않습니다." }, 400);
     }
 
@@ -60,15 +60,15 @@ serve(async (req) => {
  "location":"현재 장소",
  "worldTime":"세계 시간",
  "choices":["선택지1","선택지2"],
- "turn":"a 또는 b",
+ "turn":"a, b, c, d 또는 e",
  "check":null 또는 {"name":"판정명","ability":"능력치명","roll":20,"modifier":0,"proficiency":0,"other":0,"dc":12,"total":20,"degree":"성공도"},
  "characters":[{"player":"A","hp":20,"maxHp":20,"mp":10,"maxMp":10,"stamina":20,"maxStamina":20,"exp":0,"level":1,"inventory":[],"traits":[{"name":"특성명","description":"효과","type":"positive|negative|mixed"}],"conditions":[]}],
  "journalEntries":[{"title":"기록 제목","text":"짧은 기록"}],
  "sharedKnowledge":[],
- "individualKnowledge":{"A":[],"B":[]},
+ "individualKnowledge":{"A":[],"B":[],"C":[],"D":[],"E":[]},
  "quests":[]
 }
-characters 배열에는 변경이 필요한 캐릭터만 포함한다. 기존 값을 유지할 항목은 생략한다. 숫자 변경은 게임상태와 결과에 근거할 때만 한다. 플레이어가 선택하지 않은 레벨업 능력치 배분은 하지 않는다. 시작 요청에서는 두 캐릭터의 traits에 플레이어 입력 특성, GM 추가 특성, 종족 특성을 합쳐 넣는다. 시작 생명력/마력/체력 기본값은 각각 20/10/20이며, 종족과 특성에 근거한 조정은 설명 가능할 때만 한다. 행동 요청의 check.roll은 반드시 제공된 클라이언트 d20과 같아야 한다. check.total은 roll+modifier+proficiency+other로 계산한다. 판정이 필요 없는 대화·탐색·선택에는 check를 null로 둔다. characters에 플레이어 식별자는 A 또는 B를 사용한다. turn은 현재 행동이 끝난 뒤 차례를 넘길 플레이어다.`
+characters 배열에는 변경이 필요한 캐릭터만 포함한다. 기존 값을 유지할 항목은 생략한다. 숫자 변경은 게임상태와 결과에 근거할 때만 한다. 플레이어가 선택하지 않은 레벨업 능력치 배분은 하지 않는다. 시작 요청에서는 모든 캐릭터의 traits에 플레이어 입력 특성, GM 추가 특성, 종족 특성을 합쳐 넣는다. 시작 생명력/마력/체력 기본값은 각각 20/10/20이며, 종족과 특성에 근거한 조정은 설명 가능할 때만 한다. 행동 요청의 check.roll은 반드시 제공된 클라이언트 d20과 같아야 한다. check.total은 roll+modifier+proficiency+other로 계산한다. 판정이 필요 없는 대화·탐색·선택에는 check를 null로 둔다. characters에 플레이어 식별자는 A, B, C, D, E 중 실제 파티원을 사용한다. turn은 현재 행동이 끝난 뒤 차례를 넘길 파티원의 소문자 식별자다.`
           },
           { role: "user", content: JSON.stringify(userPayload) },
         ],

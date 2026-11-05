@@ -21,9 +21,9 @@
     return "WIS";
   }
 
-  function addJournal(state, entry) {
+    function addJournal(state, title, text) {
     state.journal = state.journal || [];
-    state.journal.push(entry);
+    state.journal.push({ title, text });
   }
 
   function start(payload) {

@@ -152,8 +152,12 @@ function showCheck(check){
 }
 function dice20(){const a=new Uint32Array(1);crypto.getRandomValues(a);return (a[0]%20)+1}
 async function callGM(payload){
-  const cfg=window.TRPG_CONFIG||{};
-  if(!cfg.SUPABASE_URL||cfg.SUPABASE_URL.includes("YOUR-PROJECT")||!cfg.SUPABASE_ANON_KEY||cfg.SUPABASE_ANON_KEY.includes("YOUR_"))throw new Error("AI 연결 설정이 아직 완료되지 않았습니다. README의 Supabase 설정을 먼저 진행해야 합니다.");
+    const cfg=window.TRPG_CONFIG||{};
+  const configured=cfg.SUPABASE_URL&&!cfg.SUPABASE_URL.includes("YOUR-PROJECT")&&cfg.SUPABASE_ANON_KEY&&!cfg.SUPABASE_ANON_KEY.includes("YOUR_");
+  if(!configured){
+    if(window.TRPGEngine)return window.TRPGEngine.handle(payload);
+    throw new Error("로컬 게임 엔진을 불러오지 못했습니다. engine.js를 확인해 주세요.");
+  }
   const response=await fetch(`${cfg.SUPABASE_URL}/functions/v1/gm`,{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.SUPABASE_ANON_KEY,"Authorization":`Bearer ${cfg.SUPABASE_ANON_KEY}`},body:JSON.stringify(payload)});
   const data=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(data.error||`AI 호출 실패 (${response.status})`);

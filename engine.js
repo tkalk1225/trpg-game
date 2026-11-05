@@ -124,9 +124,8 @@
     ];
 
     const index = state.characters.indexOf(character);
-    state.turn =
-      state.characters[(index + 1) % state.characters.length].player;
-
+     state.turn =
+      state.characters[(index + 1) % state.characters.length].player.toLowerCase();
     return state;
   }
 

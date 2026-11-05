@@ -66,7 +66,7 @@
 
     const ability = chooseAbility(actionText);
     const roll = Number(payload.visibleRoll || rollD20());
-    const bonus = modifier(character.stats[ability]);
+    const bonus = modifier(character.stats[ability.toLowerCase()]);
     const total = roll + bonus;
     const dc = /어렵|위험|강력|복잡/.test(actionText) ? 15 : 12;
     const success = total >= dc;

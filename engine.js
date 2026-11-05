@@ -117,17 +117,14 @@
 
     character.pendingStatPoints = pendingStatPoints;
     state.story = story;
-    state.lastCheck = check;
+    state.check = check;
     state.choices = [
       "주변을 더 조사한다.",
       "일행과 다음 행동을 결정한다.",
       "숲 안쪽으로 이동한다."
     ];
 
-    const index = state.characters.indexOf(character);
-     state.turn =
-      state.characters[(index + 1) % state.characters.length].player.toLowerCase();
-    return state;
+    
   }
 
   window.TRPGEngine = {

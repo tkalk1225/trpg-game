@@ -5,6 +5,7 @@ const STORAGE_KEY = "trpg_regression_save_v1";
 let state = null;
 let activeTab = "status";
 let busy = false;
+let selectedChoice = null;
 
 function $(id){return document.getElementById(id)}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -111,9 +112,13 @@ function render(){
   const c=currentCharacter(),p=state.turn;
   $("turnTitle").textContent=`플레이어 ${p.toUpperCase()} · ${c.name}의 차례`;
   $("turnBadge").textContent=p.toUpperCase();$("turnBadge").className=`turn-badge ${p}`;
-  $("choices").innerHTML=(state.choices||[]).map((x,i)=>`<button class="choice" data-choice="${i}">${i+1}. ${escapeHtml(x)}</button>`).join("");
-  $("choices").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>submitAction(state.choices[Number(b.dataset.choice)])));
-  $("actionInput").value="";
+  $("choices").innerHTML=(state.choices||[]).map((x,i)=>`<button class="choice${selectedChoice===i?" selected":""}" data-choice="${i}" type="button">${i+1}. ${escapeHtml(x)}</button>`).join("");
+$("choices").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+  selectedChoice=Number(b.dataset.choice);
+  $("choices").querySelectorAll("button").forEach(x=>x.classList.toggle("selected",Number(x.dataset.choice)===selectedChoice));
+  $("actionInput").value=state.choices[selectedChoice];
+}));
+$("actionInput").value=selectedChoice===null?"":(state.choices[selectedChoice]||"");
   renderTab();renderParty();
 }
 function renderTab(){

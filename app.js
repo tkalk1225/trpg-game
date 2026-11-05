@@ -234,6 +234,7 @@ async function submitAction(actionText){
     applyGMResult(result, true);
     showCheck(state.lastCheck);
     state.journal.push({title:`${actor.name}의 행동`,text:`${action} — ${state.story.slice(0,220)}`});
+    selectedChoice = null;
     save();render();showCheck(state.lastCheck);
   }catch(e){setError("gameError",e.message)}
   finally{busy=false;$("submitAction").disabled=false;$("submitAction").innerHTML='행동하기 <span>→</span>'}

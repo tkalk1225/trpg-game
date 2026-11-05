@@ -237,7 +237,7 @@ async function submitAction(actionText){
     selectedChoice = null;
     save();render();showCheck(state.lastCheck);
   }catch(e){setError("gameError",e.message)}
-  finally{busy=false;$("submitAction").disabled=false;$("submitAction").innerHTML='행동하기 <span>→</span>'}
+  finally{busy=false;$("submitAction").disabled=false;$("submitAction").innerHTML='선택하기 <span>→</span>'}
 }
 function resetGame(){
   if(!confirm("저장된 모험을 삭제하고 새 게임을 시작할까요?"))return;

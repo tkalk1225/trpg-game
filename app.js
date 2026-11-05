@@ -220,7 +220,7 @@ function applyGMResult(result, advanceTurn=false){
   state.turn=state.characters[(idx+1)%state.characters.length].player.toLowerCase();
 }else if(PLAYER_KEYS.slice(0,state.characters.length).includes(result.turn)){
   state.turn=result.turn;
-}
+}}
 async function submitAction(actionText){
   if(busy||!state)return;
   const action=String(actionText||"").trim();

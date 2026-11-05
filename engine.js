@@ -42,7 +42,7 @@
     ];
 
     state.turn = "a";
-    addJournal(state, "모험이 미지의 숲에서 시작되었다.");
+    addJournal(state, "모험 시작", "모험이 미지의 숲에서 시작되었다.");
 
     return state;
   }
@@ -71,13 +71,15 @@
     const dc = /어렵|위험|강력|복잡/.test(actionText) ? 15 : 12;
     const success = total >= dc;
 
-    const check = {
-      ability,
+        const check = {
+      name: `${ability} 판정`,
+      die: "1d20",
       roll,
-      bonus,
+      modifier: bonus,
+      proficiency: 0,
       total,
       dc,
-      success
+      degree: success ? "성공" : "실패"
     };
 
     let story;
@@ -101,8 +103,7 @@
       story += " 숲속의 낯선 생명체가 모습을 드러냈다.";
     }
 
-    addJournal(state, story);
-
+ addJournal(state, `${character.name}의 행동`, story);
     character.exp = Number(character.exp || 0) + (success ? 10 : 5);
 
     let pendingStatPoints = Number(character.pendingStatPoints || 0);
